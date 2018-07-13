@@ -118,7 +118,7 @@ defmodule Absinthe.Schema do
 
       import_types Absinthe.Type.BuiltIns
 
-      @after_compile unquote(__MODULE__)
+      # @after_compile unquote(__MODULE__)
       @behaviour unquote(__MODULE__)
 
       @doc false

@@ -72,6 +72,7 @@ defmodule Absinthe.Schema.Notation.Writer do
     definitions =
       env.module
       |> Module.get_attribute(:absinthe_definitions)
+      |> IO.inspect
       |> Enum.map(&update_description(&1, descriptions))
 
     {definitions, errors} =
