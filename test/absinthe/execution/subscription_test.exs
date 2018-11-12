@@ -195,12 +195,11 @@ defmodule Absinthe.Execution.SubscriptionTest do
                context: %{pubsub: PubSub}
              )
 
-
     msg = %{
-             event: "subscription:data",
-             result: %{data: %{"multipleTopics" => "foo"}},
-             topic: topic
-           }
+      event: "subscription:data",
+      result: %{data: %{"multipleTopics" => "foo"}},
+      topic: topic
+    }
 
     Absinthe.Subscription.publish(PubSub, "foo", multiple_topics: "topic_1")
 
@@ -215,6 +214,25 @@ defmodule Absinthe.Execution.SubscriptionTest do
     assert_receive({:broadcast, ^msg})
   end
 
+  test "subscribing to multiple topics doesn't result in duplicate messages" do
+    assert {:ok, %{"subscribed" => topic}} =
+             run(
+               @query,
+               Schema,
+               variables: %{},
+               context: %{pubsub: PubSub}
+             )
+
+    msg = %{
+      event: "subscription:data",
+      result: %{data: %{"multipleTopics" => "foo"}},
+      topic: topic
+    }
+
+    Absinthe.Subscription.publish(PubSub, "foo", multiple_topics: ["topic_1", "topic_2"])
+    assert_receive({:broadcast, ^msg})
+    refute_receive(_)
+  end
 
   @query """
   subscription {
