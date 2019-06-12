@@ -25,8 +25,16 @@ defmodule Absinthe.Phase.Subscription.SubscribeSelf do
       field_keys = get_field_keys(field, config)
       subscription_id = get_subscription_id(config, blueprint, options)
 
-      for field_key <- field_keys,
-          do: Absinthe.Subscription.subscribe(pubsub, field_key, subscription_id, blueprint)
+      field_keys =
+        if scope = Keyword.get(options, :scope) do
+          Enum.map(field_keys, fn {k, v} -> {String.to_atom("#{scope}_#{k}"), v} end)
+        else
+          field_keys
+        end
+
+      for field_key <- field_keys do
+        Absinthe.Subscription.subscribe(pubsub, field_key, subscription_id, blueprint)
+      end
 
       {:replace, blueprint,
        [
