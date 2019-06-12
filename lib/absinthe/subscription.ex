@@ -158,7 +158,11 @@ defmodule Absinthe.Subscription do
   @doc false
   def call(%{state: :resolved, errors: [], value: value} = res, _) do
     with {:ok, pubsub} <- extract_pubsub(res.context) do
-      __MODULE__.publish(pubsub, value, res)
+      if subscription_middleware = Application.get_env(:absinthe, :subscription_middleware) do
+        subscription_middleware.publish(pubsub, context, value, res)
+      else
+        __MODULE__.publish(pubsub, value, res)
+      end
     end
 
     res
