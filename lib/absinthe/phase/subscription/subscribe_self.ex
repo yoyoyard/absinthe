@@ -141,7 +141,11 @@ defmodule Absinthe.Phase.Subscription.SubscribeSelf do
     context_id = get_context_id(config)
     document_id = get_document_id(config, blueprint, options)
 
-    "__absinthe__:doc:#{context_id}:#{document_id}"
+    if scope = Keyword.get(options, :scope) do
+      "__absinthe__:doc:#{scope}:#{context_id}:#{document_id}"
+    else
+      "__absinthe__:doc:#{context_id}:#{document_id}"
+    end
   end
 
   defp get_context_id(config) do
